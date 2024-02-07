@@ -2,6 +2,11 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+if [ ! -d ~/.ssh/ ]; then
+ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -P ""; cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys
+fi
+
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -85,16 +90,13 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 # colored GCC warnings and errors
-export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # some more ls aliases
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
-alias beep='paplay /usr/share/sounds/freedesktop/stereo/complete.oga'
-alias less='less -R'
-alias du='du -d1 -h | sort -hr'
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -108,8 +110,6 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-alias bc='bc -lq'
-
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
@@ -120,3 +120,41 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+#https://misc.flogisoft.com/bash/tip_colors_and_formatting
+text_bold="\[\e[1m\]"
+text_reset="\[\e[0m\]"
+text_green="\[\e[32m\]"
+text_purple="\[\e[35m\]"
+text_dim="\[\e[2m\]"
+text_yellow="\[\e[33m\]"
+text_blue="\[\e[94m\]"
+text_red="\[\e[91m\]"
+text_lightyellow="\[\e[93m\]"
+
+
+#export PS1='\[`tput setaf 2`\]\u\[`tput setaf 5`\]@\h\[`tput setaf 3`\] \D{} \[`tput setaf 6`\][\w]\[`tput setaf 5`\]\$ \[`tput sgr0`\]'
+#export PS1='\[\e[1m\]\[\e[32m\]\u\[\e[0m\]\[\e[35m\]\]@\h\[\e[33m\]\[\e[2m\] \D{} \[\e[0m\]\[\e[94m\][\w]'
+
+PS1="${text_reset}${text_bold}${text_green}\u${text_reset}${text_purple}@\h${text_yellow}${text_dim} \D{} ${text_reset}${text_blue}[\w]${text_reset}"
+
+
+alias bscvpn='sudo openfortivpn gw.bsc.es:443 -u amittman'
+
+#eval $(thefuck --alias --enable-experimental-instant-mode)
+#alias fuck='thefuck'
+
+parse_git_branch() {
+     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+
+#export PS1=$PS1"\[\e[91m\]\[\e[1m\]\$(parse_git_branch)\[\e[0m\]\[\e[35m\]\$\[\e[00m\] "
+PS1=$PS1"${text_red}${text_bold}\$(parse_git_branch)${text_reset}${text_lightyellow}\$${text_reset} "
+
+shopt -s direxpand
+
+PATH="/home/arthur/perl5/bin${PATH:+:${PATH}}"; export PATH;
+PERL5LIB="/home/arthur/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="/home/arthur/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"/home/arthur/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=/home/arthur/perl5"; export PERL_MM_OPT;
